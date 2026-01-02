@@ -1,0 +1,154 @@
+EdgeGuard — Semester Project Proposal
+
+1. Project Overview
+
+I'm building EdgeGuard as a semester project to understand how companies like Cloudflare actually detect abuse, anomalies, and reliability issues at the edge. It's a security-focused system that takes in logs, requests, and events, analyzes them for suspicious behavior, and shows what's happening through a web dashboard.
+
+The goal isn't to build something production-ready - it's to learn how real infrastructure teams think. That means iterating on the design, documenting tradeoffs, and improving things over time rather than trying to get everything perfect on the first try.
+
+2. Motivation & Learning Goals
+
+Companies like Cloudflare deal with security, reliability, and performance at massive scale. I want to understand those same concerns, but in a smaller environment where I can actually learn how they work.
+
+What I'm trying to learn:
+- How to design and evolve a real system (not just a one-off script)
+- Applying security principles in actual code, not just theory
+- Using machine learning where it makes sense, not just because it's cool
+- Improving code through iteration, refactoring, and feedback
+- Documenting decisions, failures, and what I'm learning as I go
+
+3. System Scope
+
+What EdgeGuard Will Do:
+- Accept structured event data (logs, requests, auth attempts, etc.)
+- Store and process it through a backend API
+- Analyze signals to find suspicious or weird behavior
+- Show insights through a web dashboard
+- Document threat models and security assumptions
+
+What EdgeGuard Won't Do:
+- Real-time, production-scale performance (this is a learning project)
+- Enterprise-grade accuracy guarantees
+- Comprehensive attack coverage
+
+I'm keeping the scope realistic for a semester project. Better to build something simple that works than something complex that doesn't.
+
+4. Technical Architecture (Planned)
+
+Frontend:
+- Web dashboard to visualize signals, alerts, and trends
+- Keep it simple - clarity over fancy design
+
+Backend:
+- REST API to accept events, let you query them, and run analysis
+- Basic authentication so not just anyone can use it
+- Database to store events and metadata
+
+Security Layer:
+- Input validation and sanitization (people will send garbage)
+- Rate limiting to prevent abuse
+- Threat model document covering:
+  - What I'm protecting (assets)
+  - What could go wrong (threats)
+  - How I'm preventing it (mitigations)
+  - What I'm not preventing (known limitations)
+
+ML / AI Layer:
+- Simple anomaly detection (statistical methods or basic ML, not deep learning)
+- Maybe some NLP for analyzing log text (optional)
+- Focus on understanding why something was flagged, not just building the most complex model
+
+5. Milestones & Timeline
+
+Milestone 1: Project Foundation (Weeks 1–2)
+Goal: Get the structure in place
+
+- Set up repo with clear folder structure
+- Write initial README with vision and scope
+- Start a dev log to document goals and assumptions
+- Create basic skeletons for frontend and backend
+
+Deliverables:
+- Repo structure committed
+- README v1
+- Dev log entry for Week 1–2
+
+Milestone 2: Core Backend & Data Flow (Weeks 3–4)
+Goal: Make it actually work end-to-end
+
+- Build backend API that can accept events/logs
+- Design database schema for storing signals
+- Add basic authentication
+- Create a simple way to generate test data or mock logs
+
+Deliverables:
+- Working ingestion pipeline
+- Backend documentation
+- Dev log entries explaining design choices
+
+Milestone 3: Security Features & Threat Modeling (Weeks 5–6)
+Goal: Actually think about security
+
+- Input validation and proper error handling
+- Rate limiting or basic rules to detect abuse
+- Write a threat model document covering assets, threats, mitigations, and what I'm not protecting
+
+Deliverables:
+- security/threat_model.md
+- Security-related code and docs
+- Reflection on what was hard or incomplete
+
+Milestone 4: Applied ML / Anomaly Detection (Weeks 7–9)
+Goal: Use ML where it actually helps
+
+- Implement anomaly detection on the events I'm collecting
+- Evaluate if it actually works or if it's just flagging everything
+- Maybe add NLP for log classification (if it makes sense)
+- Keep ML code separate from the main system
+
+Deliverables:
+- ML module with notes on how well it works
+- Documentation explaining why I chose ML for each use case
+- Dev log entries about tradeoffs
+
+Milestone 5: Frontend Dashboard & Visualization (Weeks 10–11)
+Goal: Make it visible
+
+- Build dashboard views for:
+  - Event trends over time
+  - Alerts and anomalies
+  - System summaries
+- Keep it readable and clear
+
+Deliverables:
+- Working dashboard
+- Screenshots or demo GIFs
+- Updated README with how to use it
+
+Milestone 6: Polish, Reflection, and Documentation (Weeks 12–13)
+Goal: Make it portfolio-ready
+
+- Clean up code and refactor where needed
+- Write final README with architecture overview
+- Add a "what I'd do differently" section
+- Final dev log reflection
+
+Deliverables:
+- Final README
+- Clean git history
+- Project ready to show off
+
+6. Evaluation Criteria (How I'm Judging Success)
+
+- Making consistent progress over time (not cramming at the end)
+- Actually documenting what I'm learning and how I'm iterating
+- Making thoughtful tradeoffs instead of overengineering
+- Showing I'm thinking about security and systems design
+
+7. Expected Outcomes
+
+By the end of the semester, I want EdgeGuard to show:
+- I can design and evolve a system with multiple components
+- I understand security and reliability concerns in practice
+- I can use ML responsibly, not just because it's trendy
+- I'm coachable - I document my thinking and iterate based on feedback
