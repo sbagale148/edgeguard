@@ -1,36 +1,75 @@
 # EdgeGuard Backend
 
-The API that accepts events, stores them, and lets you query them. This is where most of the actual work happens.
+FastAPI REST API for event ingestion, storage, and anomaly detection.
 
-## Current Status
+## Setup
 
-Still just a placeholder. The real implementation starts in Milestone 2.
+```bash
+cd backend
+python -m venv venv
 
-## What I'm Planning to Build
+# Windows
+venv\Scripts\activate
 
-- API endpoints to accept events/logs (POST /api/events or something like that)
-- Some way to store this data (database, probably SQLite to start)
-- Basic auth so not just anyone can send data
-- Input validation because people will send garbage
-- Rate limiting to prevent abuse (ironic, given this is an abuse detection system)
+# macOS/Linux
+source venv/bin/activate
 
-## Tech Stack
-
-Haven't decided yet, but probably Python with Flask or FastAPI. FastAPI seems cool and has built-in docs, but Flask is simpler. We'll see.
-
-## API Ideas (Subject to Change)
-
-```
-POST   /api/events          # Send me events
-GET    /api/events          # Get events (with filters probably)
-GET    /api/events/:id      # One specific event
-GET    /api/analytics       # Analysis results from ML stuff
-POST   /api/auth/login      # Login endpoint
+pip install -r requirements.txt
 ```
 
-These will definitely change once I start building and realize what I actually need.
+## Run
 
-## Database
+```bash
+# From the backend/ directory
+python app.py
+```
 
-No idea yet. Will figure this out when I know what the data looks like.
+API docs: http://127.0.0.1:8000/docs
 
+## Seed test data
+
+```bash
+python seed.py          # Add ~330 demo events
+python seed.py --clear  # Clear existing events first
+```
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Health check (no auth) |
+| POST | `/api/v1/events` | Ingest a single event |
+| POST | `/api/v1/events/batch` | Ingest up to 100 events |
+| GET | `/api/v1/events` | List events (filterable) |
+| GET | `/api/v1/stats/summary` | Dashboard summary stats |
+| GET | `/api/v1/stats/trends` | Hourly event trends |
+| GET | `/api/v1/alerts` | List alerts |
+| POST | `/api/v1/alerts/analyze` | Run anomaly detection |
+| POST | `/api/v1/alerts/{id}/resolve` | Mark alert resolved |
+
+All endpoints except `/health` require the `X-API-Key` header.
+
+## Example: ingest an event
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/events \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: edgeguard-dev-key-change-me" \
+  -d '{
+    "event_type": "http_request",
+    "source_ip": "10.0.1.10",
+    "severity": "info",
+    "message": "GET /api/users 200",
+    "status_code": 200,
+    "path": "/api/users"
+  }'
+```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `EDGEGUARD_API_KEY` | `edgeguard-dev-key-change-me` | API authentication key |
+| `EDGEGUARD_DATABASE_URL` | `sqlite:///edgeguard.db` | Database connection string |
+| `EDGEGUARD_RATE_LIMIT` | `100` | Max requests per rate window |
+| `EDGEGUARD_RATE_WINDOW` | `60` | Rate limit window (seconds) |

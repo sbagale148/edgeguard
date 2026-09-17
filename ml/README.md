@@ -1,19 +1,50 @@
-# EdgeGuard ML / AI Layer
+# EdgeGuard ML / Anomaly Detection
 
-The part that tries to figure out if something weird is happening. This comes way later (Milestone 4), so it's just a placeholder for now.
+Statistical and ML-based anomaly detection for edge event data. Kept in a separate module so detection logic can evolve independently of the API.
 
-## What I'm Thinking About
+## Detectors
 
-Probably going to start with simple statistical methods or basic ML algorithms. Not trying to build GPT here - just need to detect when something looks off.
+| Detector | Method | What it catches |
+|----------|--------|-----------------|
+| `detect_ip_rate_anomalies` | Z-score on event counts | IPs generating unusually high traffic |
+| `detect_auth_bruteforce` | Rule-based threshold | IPs with 10+ failed auth attempts/hour |
+| `detect_isolation_forest_anomalies` | Isolation Forest | IPs with unusual behavior patterns |
+| `detect_error_spike` | Z-score on hourly error rates | System-wide error rate spikes |
 
-Maybe some NLP stuff for analyzing log text, but that's optional. The main goal is detecting anomalies in the event data.
+## Why these methods?
 
-## My Approach
+- **Z-score:** Simple, interpretable, good for volume spikes. Easy to explain in a report.
+- **Isolation Forest:** Handles multi-dimensional patterns (events + errors + auth failures + path diversity) without needing labeled attack data.
+- **Rule-based auth threshold:** Some attacks are obvious — brute force doesn't need ML.
 
-- Only use ML where it actually helps (not just because it's cool)
-- Keep it simple and interpretable - I want to understand why it flagged something
-- Document why I chose ML for each use case
-- Actually evaluate if it works or if it's just flagging everything
+I deliberately avoided deep learning. With ~300 demo events, a neural network would overfit instantly and be impossible to explain.
 
-The ML code will be separate from the main system logic so I can swap it out or improve it without breaking everything else.
+## Configuration
 
+```bash
+EDGEGUARD_ZSCORE_THRESHOLD=2.5   # Standard deviations for spike detection
+EDGEGUARD_MIN_EVENTS=10          # Minimum events before running detectors
+```
+
+## Usage
+
+Analysis runs via the API:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/alerts/analyze \
+  -H "X-API-Key: edgeguard-dev-key-change-me"
+```
+
+Or click "Run Analysis" in the dashboard.
+
+## Tradeoffs
+
+**Pros:** Fast, no training data needed, results are explainable (every alert has a human-readable reason).
+
+**Cons:** High false-positive rate on small datasets, Isolation Forest needs ~5+ unique IPs to run, thresholds are hand-tuned not learned.
+
+## What I'd do differently
+
+- Add a feedback mechanism (mark alert as false positive → adjust thresholds)
+- Store feature vectors for offline evaluation
+- Try streaming detection (EWMA) instead of batch hourly analysis

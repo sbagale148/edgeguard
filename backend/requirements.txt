@@ -1,13 +1,6 @@
-# EdgeGuard Backend Dependencies
-# To be populated in Milestone 2
-
-# Example (if using Python/Flask):
-# flask==3.0.0
-# flask-cors==4.0.0
-# sqlalchemy==2.0.23
-
-# Example (if using Python/FastAPI):
-# fastapi==0.104.1
-# uvicorn==0.24.0
-# pydantic==2.5.0
-
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+sqlalchemy==2.0.36
+pydantic==2.10.3
+scikit-learn==1.6.0
+numpy==2.1.3

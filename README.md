@@ -1,54 +1,94 @@
 # EdgeGuard
 
-Trying to figure out how companies like Cloudflare actually detect abuse and weird stuff happening at the edge. This is a semester project where I'm building a system that takes in logs and events, analyzes them for suspicious behavior, and shows what's going on through a dashboard.
+A semester learning project that simulates how edge infrastructure teams detect abuse and anomalies. EdgeGuard ingests logs and events, runs statistical/ML anomaly detection, and visualizes results through a web dashboard.
 
-## What This Is
+**Disclaimer:** This is a learning project, not production-ready security software.
 
-EdgeGuard is basically me learning how to build a security monitoring system from scratch. It's got:
-- A backend API that accepts events/logs
-- Some ML stuff to detect anomalies (probably simple at first)
-- A web dashboard to actually see what's happening
-- Documentation about security assumptions and threats
+## Architecture
 
-**Important disclaimer:** This is a learning project. It's not production-ready, and I'm not trying to make it enterprise-grade. The goal is to understand how these systems work, make mistakes, and learn from them.
+```
+┌─────────────┐     REST API      ┌──────────────┐     ┌──────────┐
+│  Dashboard  │ ◄──────────────► │  FastAPI     │ ◄──► │  SQLite  │
+│  (vanilla)  │   X-API-Key      │  Backend     │      │  DB      │
+└─────────────┘                   └──────┬───────┘      └──────────┘
+                                         │
+                                  ┌──────▼───────┐
+                                  │  ML Detector │
+                                  │  Z-score +   │
+                                  │  Isolation   │
+                                  │  Forest      │
+                                  └──────────────┘
+```
+
+## Quick Start
+
+### 1. Backend
+
+```bash
+cd backend
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS/Linux
+pip install -r requirements.txt
+python seed.py               # Load demo data
+python app.py                # Start API on :8000
+```
+
+### 2. Dashboard
+
+```bash
+cd frontend
+python -m http.server 8080
+```
+
+Open http://127.0.0.1:8080 — click **Run Analysis** to detect the simulated attacker IP.
+
+### 3. API Docs
+
+Interactive docs at http://127.0.0.1:8000/docs
 
 ## Project Structure
 
 ```
-EdgeGuard/
-├── frontend/     # Dashboard (still figuring out React vs vanilla JS)
-├── backend/      # API server (probably Python, maybe Node)
-├── ml/           # Anomaly detection stuff
-├── security/     # Threat models and security notes
-└── docs/         # Dev logs and random thoughts
+edgeguard/
+├── backend/       FastAPI server, SQLite storage, auth, rate limiting
+├── frontend/      Dashboard (HTML/CSS/JS + Chart.js)
+├── ml/            Anomaly detection (Z-score, Isolation Forest, rules)
+├── security/      Threat model and security documentation
+└── docs/          Development log
 ```
 
-## Current Status
+## Milestones
 
-✅ **Milestone 1 done** - Got the project structure set up  
-⏳ **Milestone 2** - Need to build the actual backend API  
-⏳ **Milestone 3** - Add security features and threat modeling  
-⏳ **Milestone 4** - Implement ML/anomaly detection  
-⏳ **Milestone 5** - Build the dashboard  
-⏳ **Milestone 6** - Clean everything up and document what I learned  
+| # | Milestone | Status |
+|---|-----------|--------|
+| 1 | Project foundation | Done |
+| 2 | Core backend & data flow | Done |
+| 3 | Security & threat modeling | Done |
+| 4 | ML anomaly detection | Done |
+| 5 | Frontend dashboard | Done |
+| 6 | Documentation & polish | Done |
 
-## What I'm Trying to Learn
+## What It Detects
 
-- How to design a system that actually evolves over time (not just a one-off script)
-- Applying security principles in real code, not just theory
-- Using ML where it makes sense, not just because it's cool
-- Writing code that gets better through iteration
-- Actually documenting why I made decisions (and when I messed up)
+The seed data includes normal traffic from 5 IPs plus a simulated attacker (`203.0.113.99`) doing brute-force auth and high-volume scanning. Running analysis should flag:
 
-## Getting Started
+- High-volume IP (Z-score)
+- Auth brute-force (rule-based)
+- Behavioral anomaly (Isolation Forest)
 
-Haven't figured out the tech stack yet, so installation instructions are coming later. Check back after Milestone 2.
+## What I'd Do Differently
 
-## Development Log
+- **Auth:** Per-client API keys with scopes instead of one shared key
+- **Frontend:** Backend-for-frontend proxy so the API key isn't in JavaScript
+- **ML:** Add a feedback loop for false positives; evaluate on real log data
+- **Storage:** PostgreSQL for concurrent writes; time-series partitioning for events
+- **Deployment:** Docker Compose with proper HTTPS via reverse proxy
 
-I'm keeping a dev log at [docs/dev_log.md](docs/dev_log.md) where I write down decisions, mistakes, and random thoughts as I go. It's probably more honest than this README.
+## Documentation
 
-## More Details
-
-See [proposal.txt](proposal.txt) for the full project proposal with all the details about milestones and timeline.
-
+- [Backend setup](backend/README.md)
+- [Frontend dashboard](frontend/README.md)
+- [ML detection](ml/README.md)
+- [Security & threat model](security/threat_model.md)
+- [Development log](docs/dev_log.md)
